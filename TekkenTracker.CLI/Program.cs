@@ -32,7 +32,7 @@ Description:
 
 """;
 
-    private static readonly IMatchRepository _repo = new JsonMatchRepository();
+    private static readonly IMatchRepository _repo = new JsonMatchRepository($"{AppDomain.CurrentDomain.BaseDirectory}/data.json");
     static void Main(string[] args)
     {
         if (args.Length == 0)
@@ -44,11 +44,11 @@ Description:
         switch (command)
         {
             case "add":
-                Console.WriteLine("It is add");
                 HandleAdd(args[1..]);
                 break;
             case "show":
-                Console.WriteLine("It is show");
+                var period = args.Length > 1 && args[1] == "--week" ? TimeSpan.FromDays(7) : TimeSpan.FromDays(1);
+                HandleShow(period);
                 break;
             default:
                 Console.WriteLine(HelpCommand);
@@ -77,8 +77,9 @@ Description:
         }
     }
 
-    static private void HandleShow()
+    static private void HandleShow(TimeSpan offset)
     {
-
+        var (Wins, Losses) = _repo.GetStats(offset);
+        Console.WriteLine($"{Wins}W/{Losses}L");
     }
 }
